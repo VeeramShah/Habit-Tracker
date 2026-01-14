@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Orbit | Personal Habit Tracker</title>
+    <meta name="theme-color" content="#1e1e24">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="app">
+        <header>
+            <div class="logo">
+                <i class="fa-solid fa-orbit"></i> Orbit
+            </div>
+            <div class="date-display" id="currentDateDisplay">Today</div>
+        </header>
+
+        <main id="mainContent">
+            
+            <section id="view-dashboard" class="view active">
+                <div class="welcome-banner">
+                    <h2 id="greeting">Hello!</h2>
+                    <p id="motivational-quote">Consistency is key.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="label">Today</span>
+                        <h3 id="dash-today-progress">0%</h3>
+                    </div>
+                    <div class="stat-card">
+                        <span class="label">Streak</span>
+                        <h3 id="dash-streak">0 days</h3>
+                    </div>
+                    <div class="stat-card">
+                        <span class="label">Active</span>
+                        <h3 id="dash-active-count">0</h3>
+                    </div>
+                </div>
+
+                <div class="card review-card" id="weekly-review-container" style="display:none;">
+                    <div class="card-header">
+                        <h4><i class="fa-solid fa-wand-magic-sparkles"></i> Weekly Review</h4>
+                    </div>
+                    <div class="card-body" id="weekly-review-content">
+                        </div>
+                </div>
+
+                <div class="section-header">
+                    <h3>Today's Habits</h3>
+                    <div class="date-nav">
+                        <button id="prevDay"><i class="fa-solid fa-chevron-left"></i></button>
+                        <span id="trackerDate">Today</span>
+                        <button id="nextDay"><i class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <div id="habit-list" class="habit-list">
+                    </div>
+            </section>
+
+            <section id="view-habits" class="view">
+                <div class="section-header">
+                    <h3>Manage Habits</h3>
+                    <button class="btn-primary" id="btn-add-habit"><i class="fa-solid fa-plus"></i> New</button>
+                </div>
+                <div id="manage-list" class="manage-list">
+                    </div>
+            </section>
+
+            <section id="view-analytics" class="view">
+                <h3>Analytics</h3>
+                <div class="chart-container">
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                <div class="stats-summary">
+                    <div class="stat-row">
+                        <span>Best Habit</span>
+                        <span class="highlight-green" id="best-habit-name">-</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Needs Focus</span>
+                        <span class="highlight-red" id="worst-habit-name">-</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-calendar" class="view">
+                <h3>History</h3>
+                <div class="calendar-controls">
+                    <button id="cal-prev"><i class="fa-solid fa-chevron-left"></i></button>
+                    <span id="cal-month-year">October 2023</span>
+                    <button id="cal-next"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="calendar-grid" id="calendar-grid">
+                    </div>
+            </section>
+
+            <section id="view-settings" class="view">
+                <h3>Settings</h3>
+                <div class="card">
+                    <div class="setting-item">
+                        <span>Notifications</span>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-notifs">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn-secondary" id="btn-export"><i class="fa-solid fa-download"></i> Export Data (JSON)</button>
+                    </div>
+                    <div class="setting-item">
+                        <label class="file-upload">
+                             <i class="fa-solid fa-upload"></i> Import Data
+                            <input type="file" id="file-import" accept=".json">
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <button class="btn-danger" id="btn-reset-data">Reset All Data</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-target="view-dashboard">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Today</span>
+            </button>
+            <button class="nav-btn" data-target="view-habits">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Habits</span>
+            </button>
+            <button class="nav-btn" data-target="view-analytics">
+                <i class="fa-solid fa-chart-simple"></i>
+                <span>Stats</span>
+            </button>
+            <button class="nav-btn" data-target="view-calendar">
+                <i class="fa-regular fa-calendar"></i>
+                <span>History</span>
+            </button>
+            <button class="nav-btn" data-target="view-settings">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </button>
+        </nav>
+    </div>
+
+    <div id="habitModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">New Habit</h3>
+            <form id="habitForm">
+                <input type="hidden" id="habitId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="habitName" required placeholder="e.g. Read 10 pages">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="habitCategory">
+                        <option value="Health">Health</option>
+                        <option value="Productivity">Productivity</option>
+                        <option value="Mindfulness">Mindfulness</option>
+                        <option value="Skill">Skill</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select id="habitFreqType">
+                        <option value="daily">Every Day</option>
+                        <option value="specific">Specific Days</option>
+                    </select>
+                </div>
+                <div class="form-group" id="daySelector" style="display:none;">
+                    <div class="week-select">
+                        <span data-day="0">S</span>
+                        <span data-day="1">M</span>
+                        <span data-day="2">T</span>
+                        <span data-day="3">W</span>
+                        <span data-day="4">T</span>
+                        <span data-day="5">F</span>
+                        <span data-day="6">S</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Reminder Time (Optional)</label>
+                    <input type="time" id="habitTime">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-text" id="closeModal">Cancel</button>
+                    <button type="submit" class="btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW Registered'))
+                .catch(err => console.log('SW Error', err));
+        }
+    </script>
+</body>
+</html>
